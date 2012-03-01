@@ -19,7 +19,7 @@ static long millitime();
 static int createShader(char *path, int shaderType);
 static char printShaderLogInfo(int shader, char* path);
 static char printProgramLogInfo(int program);
-static char* loadShaderFile(char* path);
+
 
 /* Fps */
 static int frameCount = 0;
@@ -195,8 +195,9 @@ static int createShader(char *path, int shaderType) {
         const char*sourceCodes[1];
         int sourceCodesLength[1];
         char* fileBuffer = NULL;
-        fileBuffer = loadShaderFile(path);
+        fileBuffer = loadFile(path);
         if(!fileBuffer) {
+            printf("Shader file not found: %s\n", path);
             return 0;
         }
         
@@ -261,29 +262,5 @@ static char printProgramLogInfo(int program) {
     return 0;
 }
 
-/* Return buffer to free ! */
-static char* loadShaderFile(char* path) {
-    FILE* file = NULL;
-    int size = 0;
-    char* fileBuffer = NULL;
-    
-    file = fopen(path, "rb");
-    if(file == NULL) {
-        printf("Shader file not found: %s\n", path);
-        return NULL;
-    }
 
-    /* get size*/    
-    fseek(file, 0L, SEEK_END);
-    size = ftell(file);
-    rewind(file);
-    
-    fileBuffer = smalloc(sizeof(char) * size);
-    fread(fileBuffer, sizeof(char), size, file);
-    
-    fclose(file);
-    return fileBuffer;
-    
-}
- 
 
