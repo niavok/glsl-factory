@@ -1,5 +1,6 @@
 #include "gui.h"
 #include <stdlib.h>
+#include <gdk/gdk.h>
 
 static void destroy(GtkWidget *widget, gpointer data);
 
