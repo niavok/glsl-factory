@@ -2,3 +2,4 @@
 *.c~
 Makefile~
 *.o
+glsl-factory
