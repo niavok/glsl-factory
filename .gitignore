@@ -3,3 +3,5 @@
 Makefile~
 *.o
 glsl-factory
+*.txt~
+*~

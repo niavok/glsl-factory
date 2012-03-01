@@ -1,0 +1,1 @@
+void *smalloc(int size);
