@@ -22,12 +22,11 @@ void gui_run(GuiDescriptor* gui) {
 }
 
 
-void gui_destroy(GuiDescriptor* gui){
+void gui_destroy(GuiDescriptor* gui) {
     free(gui);
 }
 
 
-static void destroy(GtkWidget *widget, gpointer data)
-{
+static void destroy(GtkWidget *widget, gpointer data) {
     gtk_main_quit();
 }
