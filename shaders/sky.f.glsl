@@ -13,8 +13,6 @@ float PI = 3.14159265358979323846264;
     return vec3(c1,0,c2);
 }*/
 
-
-
 vec3 genTex2( in vec2 p1 )
 {
     vec2 p = mod(p1, PI * 2.0);

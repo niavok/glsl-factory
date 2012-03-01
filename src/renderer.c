@@ -14,6 +14,13 @@
 static void drawScene();
 static void updateFps();
 static long millitime();
+
+
+static int createShader(char *path, int shaderType);
+static char printShaderLogInfo(int shader, char* path);
+static char printProgramLogInfo(int program);
+static char* loadShaderFile(char* path);
+
 /* Fps */
 static int frameCount = 0;
 long lastDisplayTime;
@@ -116,10 +123,6 @@ static long millitime() {
     return time.tv_sec*1000 + time.tv_nsec / 1000000;
 }
 
-
-static int createShader(char *path, int shaderType);
-static char printLogInfo(int shader, char* path);
-
 static void initShaders() {
     
     printf("Init shaders\n");
@@ -154,6 +157,24 @@ static void initShaders() {
         fragShader = createShader(fullPath, GL_FRAGMENT_SHADER);
         
         free(fullPath);
+        
+        if(vertShader && fragShader) {
+            glAttachShader(shaderId, vertShader);
+            glAttachShader(shaderId, fragShader);
+            
+            if(geoShader) {
+                glAttachShader(shaderId, geoShader);
+            }
+            
+            glLinkProgram(shaderId);
+            glValidateProgram(shaderId);
+            
+            if(!printProgramLogInfo(shaderId)) {
+                glDeleteProgram(shaderId);
+                shaderId = 0;
+            }
+        }
+        
     
     } else {
         printf("Fail to create shader\n");
@@ -173,14 +194,21 @@ static int createShader(char *path, int shaderType) {
     } else {
         const char*sourceCodes[1];
         int sourceCodesLength[1];
-        sourceCodes[0] = "uniform float coucou;";
+        char* fileBuffer = NULL;
+        fileBuffer = loadShaderFile(path);
+        if(!fileBuffer) {
+            return 0;
+        }
+        
+        sourceCodes[0] = fileBuffer;
         sourceCodesLength[0] = strlen(sourceCodes[0]);
         
-        
-        glShaderSource(shader, 1, sourceCodes , sourceCodesLength);
+        glShaderSource(shader, 1, (const char**) sourceCodes , sourceCodesLength);
         glCompileShader(shader);
         
-        if(!printLogInfo(shader, path)) {
+        free(fileBuffer);
+        
+        if(!printShaderLogInfo(shader, path)) {
             return 0;
         }
         printf("Shader %d successfully loaded: %s\n", shader, path);
@@ -189,28 +217,73 @@ static int createShader(char *path, int shaderType) {
     }
 }
 
-static char printLogInfo(int shader, char* path) {
-        int length = 0;
+static char printShaderLogInfo(int shader, char* path) {
+    int length = 0;
+    
+	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+
+    if (length > 0) {
+        /* We have some info we need to output. */
+
+        char* infoLog = smalloc(sizeof(char) * length);
+        int infoLogLength = 0;
         
-    	glGetShaderiv(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &length);
+        glGetShaderInfoLog(shader, length, &infoLogLength, infoLog);
 
-        if (length > 1) {
-            /* We have some info we need to output. */
+        printf("Compile log for shader %s: \n%s", path, infoLog);
 
-            char* infoLog = smalloc(sizeof(char) * length);
-            int infoLogLength = 0;
-            
-            glGetShaderInfoLog(shader, length, &infoLogLength, infoLog);
+        free(infoLog);
+    } else {
+        return 1;
+    }
+    return 0;
+}
 
-            printf("Compile log for shader %s: \n%s", path, infoLog);
+static char printProgramLogInfo(int program) {
+    int length = 0;
+    
+	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
 
-            free(infoLog);
-        } else {
-            return 1;
-        }
-        return 0;
+    if (length > 0) {
+        /* We have some info we need to output. */
+
+        char* infoLog = smalloc(sizeof(char) * length);
+        int infoLogLength = 0;
+        
+        glGetProgramInfoLog(program, length, &infoLogLength, infoLog);
+
+        printf("Compile log for program: \n%s", infoLog);
+
+        free(infoLog);
+    } else {
+        return 1;
+    }
+    return 0;
+}
+
+/* Return buffer to free ! */
+static char* loadShaderFile(char* path) {
+    FILE* file = NULL;
+    int size = 0;
+    char* fileBuffer = NULL;
+    
+    file = fopen(path, "rb");
+    if(file == NULL) {
+        printf("Shader file not found: %s\n", path);
+        return NULL;
     }
 
+    /* get size*/    
+    fseek(file, 0L, SEEK_END);
+    size = ftell(file);
+    rewind(file);
     
+    fileBuffer = smalloc(sizeof(char) * size);
+    fread(fileBuffer, sizeof(char), size, file);
+    
+    fclose(file);
+    return fileBuffer;
+    
+}
  
 
