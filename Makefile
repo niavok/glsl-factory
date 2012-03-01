@@ -16,7 +16,7 @@ glsl-factory.o: gui.h
 	$(CC) -o $@ -c $< $(CFLAGS)
 
 clean:
-	rm *.o
+	rm $(OBJ)
     
 mrproper: clean
 	rm $(EXEC)

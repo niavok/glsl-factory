@@ -117,14 +117,14 @@ static long millitime() {
 }
 
 
-static int createVertShader(char *path);
-static int createGeometryShader(char *path);
-static int createFragShader(char *path);
+static int createShader(char *path, int shaderType);
+static char printLogInfo(int shader, char* path);
 
 static void initShaders() {
-    shaderId = glCreateProgram();
     
-  
+    printf("Init shaders\n");
+    
+    shaderId = glCreateProgram();
     
     
     if(shaderId != 0) {
@@ -139,44 +139,77 @@ static void initShaders() {
         strcat(fullPath, name);
         strcat(fullPath, ".v");
         strcat(fullPath, extension);
-        vertShader = createVertShader(fullPath);
+        vertShader = createShader(fullPath, GL_VERTEX_SHADER);
         
         strcpy(fullPath, pathBase);
         strcat(fullPath, name);
         strcat(fullPath, ".g");
         strcat(fullPath, extension);
-        geoShader = createGeometryShader(fullPath);
+        geoShader = createShader(fullPath, GL_GEOMETRY_SHADER);
 
         strcpy(fullPath, pathBase);
         strcat(fullPath, name);
         strcat(fullPath, ".f");
         strcat(fullPath, extension);
-        fragShader = createFragShader(fullPath);
-        
+        fragShader = createShader(fullPath, GL_FRAGMENT_SHADER);
         
         free(fullPath);
     
     } else {
-        printf("Fail to create shader");
+        printf("Fail to create shader\n");
     }
 
 }
 
-static int createVertShader(char *path) {
-    (void) path;
-    return 0;
+static int createShader(char *path, int shaderType) {
+    int shader = 0;
+    
+    printf("Load shader: %s\n", path);
+
+    shader = glCreateShader(shaderType);
+    if (shader == 0) {
+        printf("Fail to create shader: %s\n", path);
+        return 0;
+    } else {
+        const char*sourceCodes[1];
+        int sourceCodesLength[1];
+        sourceCodes[0] = "uniform float coucou;";
+        sourceCodesLength[0] = strlen(sourceCodes[0]);
+        
+        
+        glShaderSource(shader, 1, sourceCodes , sourceCodesLength);
+        glCompileShader(shader);
+        
+        if(!printLogInfo(shader, path)) {
+            return 0;
+        }
+        printf("Shader %d successfully loaded: %s\n", shader, path);
+        
+        return shader;
+    }
 }
 
-static int createGeometryShader(char *path) {
-    (void) path;
-    return 0;
-}
+static char printLogInfo(int shader, char* path) {
+        int length = 0;
+        
+    	glGetShaderiv(shader, GL_OBJECT_INFO_LOG_LENGTH_ARB, &length);
 
-static int createFragShader(char *path) {
-    (void) path;
-    return 0;
-}
+        if (length > 1) {
+            /* We have some info we need to output. */
 
+            char* infoLog = smalloc(sizeof(char) * length);
+            int infoLogLength = 0;
+            
+            glGetShaderInfoLog(shader, length, &infoLogLength, infoLog);
+
+            printf("Compile log for shader %s: \n%s", path, infoLog);
+
+            free(infoLog);
+        } else {
+            return 1;
+        }
+        return 0;
+    }
 
     
  
