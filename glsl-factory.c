@@ -1,7 +1,12 @@
-// GLSL Factory Main
-#include <stdio.h>  
+/* GLSL Factory Main */
+#include <stdio.h>
+#include "gui.h"
 
+int main(int argc, char *argv[]) {
+    GuiDescriptor * descriptor;
 
-int main() {
-    printf("Hello world!\n");
+    descriptor = gui_init(argc, argv);
+    gui_run(descriptor);
+    gui_destroy(descriptor);
+    return 0;
 }
