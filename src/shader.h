@@ -35,6 +35,8 @@ void shader_init(Shader *shader);
 
 void shader_load(Shader *shader, char* shaderDescriptionPath);
 
+void shader_reload(Shader *shader);
+
 void shader_setUniforms(Shader *shader);
 
 void shader_destroy(Shader *shader);

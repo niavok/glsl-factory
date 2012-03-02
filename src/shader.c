@@ -11,6 +11,7 @@
 
 
 static void createShaderProgram(Shader *shader);
+static void destroyShaderProgram(Shader *shader);
 static int createShader(char *path, int shaderType);
 static char printShaderLogInfo(int shader, char* path);
 static char printProgramLogInfo(int program);
@@ -100,11 +101,12 @@ void shader_load(Shader *shader, char* shaderDescriptionPath) {
     
     createShaderProgram(shader);
     
-    if(shader->programId) {
-        shader->loaded = 1;
-    }
-    
     free(basePath);
+}
+
+void shader_reload(Shader *shader) {
+    destroyShaderProgram(shader);
+    createShaderProgram(shader);
 }
 
 void shader_destroy(Shader *shader) {
@@ -113,13 +115,8 @@ void shader_destroy(Shader *shader) {
     free(shader->vertexShaderPath);    
     free(shader->geometryShaderPath);
     free(shader->fragmentShaderPath);
-    
-    glDeleteProgram(shader->programId);
-    glDeleteShader(shader->vertexShaderId);
-    glDeleteShader(shader->geometryShaderId);
-    glDeleteShader(shader->fragmentShaderId);
-    
-    shader->loaded = 0;
+
+    destroyShaderProgram(shader);
     
     for(i = 0; i < shader->paramListSize; i++) {
         ShaderParam *param = shader->paramList[i];
@@ -172,19 +169,19 @@ static void createShaderProgram(Shader *shader) {
                 shader->programId = 0;
             }
             
-            
             uniform_inputRotation = glGetUniformLocation(shader->programId, "inputRotation");
             uniform_resolution = glGetUniformLocation(shader->programId, "resolution");
             uniform_time = glGetUniformLocation(shader->programId, "time");
-       
-            printf("Shaders loaded\n");   
         }
-        
-    
     } else {
         printf("Fail to create shader\n");
     }
     checkGLError("glCreateProgram end");
+    
+    if(shader->programId) {
+        shader->loaded = 1;
+        printf("Shaders loaded\n");   
+    }
 }
 
 static int createShader(char *path, int shaderType) {
@@ -267,5 +264,15 @@ static char printProgramLogInfo(int program) {
 
 static void shaderParam_destroy(ShaderParam *shaderParam) {
     free(shaderParam->name);
+}
+
+
+static void destroyShaderProgram(Shader *shader) {
+    glDeleteProgram(shader->programId);
+    glDeleteShader(shader->vertexShaderId);
+    glDeleteShader(shader->geometryShaderId);
+    glDeleteShader(shader->fragmentShaderId);
+    
+    shader->loaded = 0;
 }
 

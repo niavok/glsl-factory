@@ -85,7 +85,7 @@ void main(void)
     ao = smoothstep(0.0,0.4,ao)-smoothstep(0.4,0.7,ao);
     ao = 1.0-0.5*ao*r;
 
-    gl_FragColor = vec4(col*col*w*ao,1.0);
+    gl_FragColor = vec4(col*w*ao,1.0);
 }
 
 

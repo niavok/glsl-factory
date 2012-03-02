@@ -36,18 +36,31 @@ void renderer_run(Renderer* renderer) {
     char running = 1;
     SDL_Event event;
     
-    (void) renderer;
-
     lastDisplayTime = millitime();
 
-    while (running)
-    {
-        while (SDL_PollEvent(&event))
-        {
-            switch(event.type)
-            {
+    while (running) {
+        while (SDL_PollEvent(&event)) {
+            switch(event.type) {
                 case SDL_QUIT:
                     running = 0;
+                    break;
+                case SDL_KEYDOWN:
+                    switch (event.key.keysym.sym) {
+                        case SDLK_ESCAPE: /* Quit */
+                            running = 0;
+                            break;
+                        case SDLK_F5: /* Reload shader */
+                            if(renderer->shader) {
+                                shader_reload(renderer->shader);
+                                renderer_bindShader(renderer, renderer->shader);
+                            }
+                            break;
+                        default:
+                        break;
+                    }
+                    break;
+                default:
+                    break;
             }
         }
         drawScene(renderer);
