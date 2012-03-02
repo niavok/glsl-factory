@@ -3,15 +3,20 @@
 
 #include "shader.h"
 
-typedef struct {
-    Shader *shader;
-} Renderer;
+struct Shader;
+typedef struct Renderer Renderer;
+
+struct Renderer{
+    int XResolution;
+    int YResolution;
+    struct Shader *shader;
+};
 
 void renderer_init(Renderer *renderer);
 
 void renderer_run(Renderer* renderer);
 
-void renderer_bindShader(Renderer* renderer, Shader* shader);
+void renderer_bindShader(Renderer* renderer,struct Shader* shader);
 
 void renderer_destroy(Renderer* renderer);
 

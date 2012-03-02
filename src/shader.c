@@ -131,7 +131,7 @@ void shader_destroy(Shader *shader) {
 
 void shader_setUniforms(Shader *shader) {
     (void) shader;
-    glUniform2f(uniform_resolution, 1024,768);
+    glUniform2f(uniform_resolution, shader->renderer->XResolution  ,shader->renderer->YResolution);
     glUniform1f(uniform_time, (float) millitime() /1000.0 );
 }
 

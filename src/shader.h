@@ -1,19 +1,26 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "renderer.h"
+
+struct Renderer;
+
+typedef struct Shader Shader;
+typedef struct ShaderParam ShaderParam;
+
 typedef enum  {
     TIME_S,
     TIME_MS,
     RESOLUTION
 } ShaderParamType;
 
-typedef struct {
+struct ShaderParam {
     char* name;
     ShaderParamType type;
-} ShaderParam;
+};
 
 
-typedef struct {
+struct Shader {
     char* vertexShaderPath;    
     char* geometryShaderPath;
     char* fragmentShaderPath;
@@ -27,8 +34,8 @@ typedef struct {
 
     int paramListSize;
     ShaderParam **paramList;
-
-} Shader;
+    struct Renderer * renderer;
+} ;
 
 
 void shader_init(Shader *shader);

@@ -21,15 +21,16 @@ long lastDisplayTime;
 void renderer_init(Renderer * renderer) {
     SDL_Surface *screen;
 
-    (void) renderer;
-    
+    renderer->XResolution = 320;
+    renderer->YResolution = 240;
+
     SDL_Init(SDL_INIT_VIDEO);
     
-    screen = SDL_SetVideoMode(1024, 768, 32, SDL_OPENGL);
+    screen = SDL_SetVideoMode(renderer->XResolution, renderer->YResolution, 32, SDL_OPENGL);
 
     SDL_Flip(screen);
     
-    SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 0);
+    /*SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, 0);*/
 }
 
 void renderer_run(Renderer* renderer) {
@@ -76,6 +77,7 @@ void renderer_destroy(Renderer* renderer) {
 
 void renderer_bindShader(Renderer* renderer, Shader* shader) {
     renderer->shader = shader;
+    shader->renderer = renderer;
 }
 
 
