@@ -32,10 +32,12 @@ char* loadFile(char* path) {
     size = ftell(file);
     rewind(file);
     
-    fileBuffer = smalloc(sizeof(char) * size);
+    fileBuffer = smalloc(sizeof(char) * (size+1));
     fread(fileBuffer, sizeof(char), size, file);
     
     fclose(file);
+    fileBuffer[size] = '\0';
+    
     return fileBuffer;
     
 }

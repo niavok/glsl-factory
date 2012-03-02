@@ -162,14 +162,17 @@ static void createShaderProgram(Shader *shader) {
             }
 
             glLinkProgram(shader->programId);
+            checkGLError("link");
+            
             glValidateProgram(shader->programId);
+            checkGLError("validate");
             
             if(!printProgramLogInfo(shader->programId)) {
                 glDeleteProgram(shader->programId);
                 shader->programId = 0;
             }
             
-            uniform_inputRotation = glGetUniformLocation(shader->programId, "inputRotation");
+            /*uniform_inputRotation = glGetUniformLocation(shader->programId, "inputRotation");*/
             uniform_resolution = glGetUniformLocation(shader->programId, "resolution");
             uniform_time = glGetUniformLocation(shader->programId, "time");
         }
@@ -194,26 +197,32 @@ static int createShader(char *path, int shaderType) {
         printf("Fail to create shader: %s\n", path);
         return 0;
     } else {
-        const char*sourceCodes[1];
-        int sourceCodesLength[1];
+        char*sourceCodes[1];
         char* fileBuffer = NULL;
         fileBuffer = loadFile(path);
         if(!fileBuffer) {
             printf("Shader file not found: %s\n", path);
             return 0;
         }
-        
         sourceCodes[0] = fileBuffer;
-        sourceCodesLength[0] = strlen(sourceCodes[0]);
         
-        glShaderSource(shader, 1, (const char**) sourceCodes , sourceCodesLength);
+        printf("--------------------\n");
+           printf("%s\n",sourceCodes[0]);
+        printf("--------------------\n");
+        
+        glShaderSource(shader, 1, (const char**) sourceCodes , NULL);
         glCompileShader(shader);
+        
         
         free(fileBuffer);
         
         if(!printShaderLogInfo(shader, path)) {
             return 0;
         }
+        
+    
+        checkGLError("createShader");
+        
         return shader;
     }
 }
