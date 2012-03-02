@@ -18,7 +18,6 @@ vec3 genTex2( in vec2 p1 )
     vec2 p = mod(p1, PI * 2.0);
     float a = sin(p.x);
     float b = sin(p.y);
-    
     vec3 c = vec3(1.0);
     
     c.x  = (sin(1.1*time + 20.5*a) * cos(1.5 * time + 19.7*b)) * 0.2 +1.0;
@@ -86,7 +85,7 @@ void main(void)
     ao = smoothstep(0.0,0.4,ao)-smoothstep(0.4,0.7,ao);
     ao = 1.0-0.5*ao*r;
 
-    gl_FragColor = vec4(col*w*ao,1.0);
+    gl_FragColor = vec4(col*col*w*ao,1.0);
 }
 
 

@@ -1,11 +1,19 @@
+#ifndef RENDERER_H
+#define RENDERER_H
+
+#include "shader.h"
 
 typedef struct {
-    int i;
-} RendererDescriptor;
+    Shader *shader;
+} Renderer;
 
-RendererDescriptor* renderer_init();
+void renderer_init(Renderer *renderer);
 
-void renderer_run(RendererDescriptor* gui);
+void renderer_run(Renderer* renderer);
 
-void renderer_destroy(RendererDescriptor* gui);
+void renderer_bindShader(Renderer* renderer, Shader* shader);
 
+void renderer_destroy(Renderer* renderer);
+
+
+#endif

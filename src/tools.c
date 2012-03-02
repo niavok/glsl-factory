@@ -1,5 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
 #include "tools.h"
 
 void *smalloc(int size) {
@@ -36,3 +40,37 @@ char* loadFile(char* path) {
     
 }
  
+/* Return buffer to free ! */
+char *substr(char *string, int from) {
+    char *out;
+    out = smalloc(sizeof(char) * (strlen(string) - from +1));
+    strncpy(out, string+from , strlen(string) - from);
+    out[strlen(string) - from] = '\0';
+    return out;
+}
+
+char *string_cat(char *first, char *second) {
+    char *out;
+    out = smalloc(sizeof(char) * (strlen(first) + strlen(second) +1));
+    out[0] = '\0';
+    strcat(out, first);
+    strcat(out, second);
+    return out;
+}
+
+
+long millitime() {
+    struct timespec time;
+    clock_gettime(CLOCK_MONOTONIC, &time);
+    return time.tv_sec*1000 + time.tv_nsec / 1000000;
+}
+
+void checkGLError(char* context) {
+    GLenum errCode;
+    const GLubyte *errString;
+    
+    if ((errCode = glGetError()) != GL_NO_ERROR) {
+        errString = gluErrorString(errCode);
+       fprintf (stderr, "OpenGL Error at %s: %s\n", context, errString);
+    }
+}
