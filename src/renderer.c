@@ -25,7 +25,7 @@ void renderer_init(Renderer * renderer) {
     
     SDL_Init(SDL_INIT_VIDEO);
     
-    screen = SDL_SetVideoMode(800, 600, 32, SDL_OPENGL);
+    screen = SDL_SetVideoMode(1024, 768, 32, SDL_OPENGL);
 
     SDL_Flip(screen);
     
