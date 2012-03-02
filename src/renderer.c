@@ -31,6 +31,9 @@ static int shaderId = 0;
 static int vertShader = 0;
 static int geoShader = 0;
 static int fragShader = 0;
+static int uniform_inputRotation = 0;
+static int uniform_resolution = 0;
+static int uniform_time = 0;
 
 
 RendererDescriptor* renderer_init() {
@@ -82,20 +85,41 @@ void renderer_destroy(RendererDescriptor* gui) {
     SDL_Quit();
 }
 
-static void drawScene() {
-    glClear(GL_COLOR_BUFFER_BIT);
+static void checkGLError(char* context) {
+    GLenum errCode;
+    const GLubyte *errString;
+    
+    if ((errCode = glGetError()) != GL_NO_ERROR) {
+        errString = gluErrorString(errCode);
+       fprintf (stderr, "OpenGL Error at %s: %s\n", context, errString);
+    }
+}
 
+static void drawScene() {
+
+    glClear(GL_COLOR_BUFFER_BIT);
+    /*checkGLError("glClear");*/
     glUseProgram(shaderId);
+    /*checkGLError("glUseProgram");*/
+
+
+
+    glUniform2f(uniform_resolution, 800,600);
+    glUniform1f(uniform_time, (float) millitime() /1000.0 );
+
 
     glBegin(GL_TRIANGLES);
         glColor3ub(255,0,0);    glVertex2d(-0.75,-0.75);
         glColor3ub(0,255,0);    glVertex2d(0,0.75);
         glColor3ub(0,0,255);    glVertex2d(0.75,-0.75);
     glEnd();
-    
+    /*checkGLError("glEnd");*/
     glUseProgram(0);
-    
+    /*checkGLError("glUseProgram 0");    */
     glFlush();
+    /*checkGLError("glFlush");
+    checkGLError("glFlush");
+    */
     SDL_GL_SwapBuffers();
 }
 
@@ -125,10 +149,13 @@ static long millitime() {
 
 static void initShaders() {
     
+    checkGLError("initShaders");
+    
     printf("Init shaders\n");
     
-    shaderId = glCreateProgram();
     
+    shaderId = glCreateProgram();
+    checkGLError("glCreateProgram");
     
     if(shaderId != 0) {
         char* name = "sky";
@@ -158,6 +185,9 @@ static void initShaders() {
         
         free(fullPath);
         
+        printf("vertShader %d\n",vertShader);
+        printf("fragShader %d\n",fragShader);      
+        
         if(vertShader && fragShader) {
             glAttachShader(shaderId, vertShader);
             glAttachShader(shaderId, fragShader);
@@ -173,12 +203,21 @@ static void initShaders() {
                 glDeleteProgram(shaderId);
                 shaderId = 0;
             }
+            
+            
+            uniform_inputRotation = glGetUniformLocation(shaderId, "inputRotation");
+            uniform_resolution = glGetUniformLocation(shaderId, "resolution");
+            uniform_time = glGetUniformLocation(shaderId, "time");
+         
+            printf("Shaders loaded\n");   
         }
         
     
     } else {
         printf("Fail to create shader\n");
     }
+    
+    checkGLError("glCreateProgram end");
 
 }
 
@@ -223,7 +262,7 @@ static char printShaderLogInfo(int shader, char* path) {
     
 	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 
-    if (length > 0) {
+    if (length > 1) {
         /* We have some info we need to output. */
 
         char* infoLog = smalloc(sizeof(char) * length);
@@ -245,7 +284,7 @@ static char printProgramLogInfo(int program) {
     
 	glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
 
-    if (length > 0) {
+    if (length > 1) {
         /* We have some info we need to output. */
 
         char* infoLog = smalloc(sizeof(char) * length);
